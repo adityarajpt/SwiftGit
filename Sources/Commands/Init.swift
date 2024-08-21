@@ -26,7 +26,7 @@ extension SwiftGit {
         
         func fileAccess() throws {
             let fileManager = FileManager()
-            guard self.swiftGitExist(fileManager: fileManager) == false else {
+            guard OSHelpers.haveSGitAtCurrentPath(fileManager: fileManager) == false else {
                 print("sGit repo already exists")
                 return
             }
@@ -34,16 +34,16 @@ extension SwiftGit {
             // Create sgit files and directory
             
             // 1. Create /.sgit/ directory
-            try fileManager.createDirectory(atPath: self.sGitDirectoryPath(fileManager: fileManager), withIntermediateDirectories: path != nil)
+            try fileManager.createDirectory(atPath: OSHelpers.sGitDirectoryPath(fileManager: fileManager, path: self.path), withIntermediateDirectories: path != nil)
             
             // 2. Create SubDirectories
             
             // Objects
-            let objectsPath = self.sGitDirectoryPath(fileManager: fileManager) + Self.delimitor + "objects"
+            let objectsPath = OSHelpers.sGitDirectoryPath(fileManager: fileManager, path: self.path) + Self.delimitor + "objects"
             try fileManager.createDirectory(atPath: objectsPath, withIntermediateDirectories: false)
             
             // Refs
-            let refsPath = self.sGitDirectoryPath(fileManager: fileManager) + Self.delimitor + "refs"
+            let refsPath = OSHelpers.sGitDirectoryPath(fileManager: fileManager, path: self.path) + Self.delimitor + "refs"
             try fileManager.createDirectory(atPath: refsPath, withIntermediateDirectories: false)
             
             // HEAD
@@ -55,23 +55,6 @@ extension SwiftGit {
             // Description
             
             
-        }
-        
-        private func swiftGitExist(fileManager: FileManager) -> Bool {
-            let sGitPath = self.sGitDirectoryPath(fileManager: fileManager)
-            if fileManager.fileExists(atPath: sGitPath) == true {
-                return true
-            } else {
-                return false
-            }
-        }
-        
-        private func sGitDirectoryPath(fileManager: FileManager) -> String {
-            if let path = self.path {
-                return fileManager.currentDirectoryPath + "/" + path + "/.sgit"
-            } else {
-                return fileManager.currentDirectoryPath + "/" + ".sgit"
-            }
         }
     }
 }
